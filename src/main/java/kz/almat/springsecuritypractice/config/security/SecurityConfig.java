@@ -1,9 +1,11 @@
 package kz.almat.springsecuritypractice.config.security;
 
+import kz.almat.springsecuritypractice.config.security.permission.TweetPermission;
 import kz.almat.springsecuritypractice.config.security.role.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -34,9 +36,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/", "index", "/css/*", "/js/*").permitAll()
-//                .antMatchers("/api/**").hasRole(ADMIN.name())
+                .antMatchers(HttpMethod.GET, "/api/tweets/**").hasAuthority(TweetPermission.TWEET_READ.getPermission())
+                .antMatchers(HttpMethod.POST, "/api/tweets/**").hasAuthority(TweetPermission.TWEET_WRITE.getPermission())
+                .antMatchers(HttpMethod.PUT, "/api/tweets/**").hasAuthority(TweetPermission.TWEET_UPDATE.getPermission())
+                .antMatchers(HttpMethod.DELETE, "/api/tweets/**").hasAuthority(TweetPermission.TWEET_DELETE.getPermission())
+                .antMatchers("/api/**").hasRole(ADMIN.name())
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -49,13 +56,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         UserDetails userAlmat = User.builder()
                 .username("almat")
                 .password(passwordEncoder.encode("almat"))
-                .roles(USER.name()) //ROLE_USER
+                .authorities(USER.getGrantedAuthorities())
                 .build();
 
         UserDetails userAdmin = User.builder()
                 .username("admin")
                 .password(passwordEncoder.encode("admin"))
-                .roles(ADMIN.name()) //ROLE_ADMIN
+                .authorities(ADMIN.getGrantedAuthorities())
                 .build();
 
         return new InMemoryUserDetailsManager(
