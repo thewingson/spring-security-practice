@@ -1,6 +1,7 @@
 package kz.almat.springsecuritypractice.rest;
 
 import kz.almat.springsecuritypractice.model.Tweet;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
@@ -13,6 +14,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/tweets")
+@PreAuthorize(value = "hasAnyRole('ROLE_ADMIN, ROLE_USER')")
 public class TweetRest {
 
     private Set<Tweet> tweets = new HashSet<>();
@@ -39,11 +41,13 @@ public class TweetRest {
     }
 
     @PostMapping
+    @PreAuthorize(value = "hasAuthority('tweet:write')")
     public void add(@RequestBody Tweet tweet) {
         tweets.add(tweet);
     }
 
     @PutMapping("{id}")
+    @PreAuthorize(value = "hasAuthority('tweet:update')")
     public void update(@PathVariable Integer id,
                        @RequestBody Tweet tweet) {
         tweets.stream()
@@ -52,6 +56,7 @@ public class TweetRest {
     }
 
     @DeleteMapping("{id}")
+    @PreAuthorize(value = "hasAuthority('tweet:delete')")
     public void delete(@PathVariable Integer id) {
         tweets.stream()
                 .filter(tweet -> tweet.getId().equals(id)).findFirst()

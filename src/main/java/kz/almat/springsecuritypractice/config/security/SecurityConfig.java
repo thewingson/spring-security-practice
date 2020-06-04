@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -24,6 +25,7 @@ import static kz.almat.springsecuritypractice.config.security.role.Role.USER;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
@@ -39,11 +41,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/", "index", "/css/*", "/js/*").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/tweets/**").hasAuthority(TweetPermission.TWEET_READ.getPermission())
-                .antMatchers(HttpMethod.POST, "/api/tweets/**").hasAuthority(TweetPermission.TWEET_WRITE.getPermission())
-                .antMatchers(HttpMethod.PUT, "/api/tweets/**").hasAuthority(TweetPermission.TWEET_UPDATE.getPermission())
-                .antMatchers(HttpMethod.DELETE, "/api/tweets/**").hasAuthority(TweetPermission.TWEET_DELETE.getPermission())
-                .antMatchers("/api/**").hasRole(ADMIN.name())
+//                .antMatchers(HttpMethod.GET, "/api/tweets/**").hasAuthority(TweetPermission.TWEET_READ.getPermission())
+//                .antMatchers(HttpMethod.POST, "/api/tweets/**").hasAuthority(TweetPermission.TWEET_WRITE.getPermission())
+//                .antMatchers(HttpMethod.PUT, "/api/tweets/**").hasAuthority(TweetPermission.TWEET_UPDATE.getPermission())
+//                .antMatchers(HttpMethod.DELETE, "/api/tweets/**").hasAuthority(TweetPermission.TWEET_DELETE.getPermission())
+//                .antMatchers("/api/**").hasRole(ADMIN.name())
                 .anyRequest()
                 .authenticated()
                 .and()
